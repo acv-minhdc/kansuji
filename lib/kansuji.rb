@@ -3,17 +3,8 @@ $base_kanji = { char_num: ['', '一', '二', '三', '四', '五', '六', '七', 
 def str_num_to_kanji(str)
   str = str.to_i.to_s # delete leading zero
   return $base_kanji[:char_num][str[0].to_i] if str.length == 1 # stop recursion
-  # if $base_kanji[:char_count].key?(str.length)
-  #   return (str[0] == '1' ? '' : $base_kanji[:char_num][str[0].to_i]) + $base_kanji[:char_count][str.length] + str_num_to_kanji(str[1, str.length - 1])
-  # else
-  #   $base_kanji[:char_count].keys.reverse.each do |value|
-  #     return str_num_to_kanji(str[0, str.length - value + 1]) + $base_kanji[:char_count][value] + str_num_to_kanji(str[str.length - value + 1, str.length - 2]) if str.length > value
-  #   end
-  # end
   count = str.length
-  until $base_kanji[:char_count][count]
-    count -= 1
-  end
+  count -= 1 until $base_kanji[:char_count][count]
   first_char = str_num_to_kanji(str[0, str.length - count + 1])
   (first_char == '一' ? '' : first_char) + $base_kanji[:char_count][count] + str_num_to_kanji(str[str.length - count + 1, count - 1])
 end
