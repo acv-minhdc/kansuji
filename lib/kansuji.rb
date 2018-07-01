@@ -15,25 +15,18 @@ class Numeric
   end
 end
 
+def kanji_to_num(str)
+  return 0 if str.empty?
+  return $base_kanji[:char_num].find_index(str) if str.length == 1 && $base_kanji[:char_num].include?(str)
+  count_char_collection = str.chars.select { |char| $base_kanji[:char_count].value?(char) }
+  raise ArgumentError, 'Invalid format kanji number to convert' if count_char_collection.empty?
+  max_count_char = count_char_collection.max_by { |char| $base_kanji[:char_count].key(char) }
+  first_char = str[0, str.index(max_count_char)]
+  (first_char.empty? ? 1 : kanji_to_num(first_char)) * 10**($base_kanji[:char_count].key(max_count_char) - 1) + kanji_to_num(str[str.index(max_count_char) + 1, str.length - str.index(max_count_char) - 1])
+end
+
 class String
   def to_number
-    str = reverse
-    result = ''
-    parse_kanji = $base_kanji[:char_count]
-    str.each_char.with_index do |char, index|
-      if index.even?
-        chart_to_num = $base_kanji[:char_num].find_index(char)
-        result += if chart_to_num
-                    chart_to_num.to_s
-                  else
-                    result.empty? ? '0' : '1'
-                  end
-      else
-        expect_count, expect_char = parse_kanji.first
-        until parse_kanji.shift.include?(char); end
-        result += '0' * (parse_kanji.key(char) - expect_count - 1)
-      end
-    end
-    result.reverse!.to_i
+    self == '零' ? 0 : kanji_to_num(self)
   end
 end
