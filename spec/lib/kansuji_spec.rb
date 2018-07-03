@@ -1,99 +1,49 @@
-# frozen_string_literal: true
+require "spec_helper"
 
-require 'rails_helper'
-require 'kansuji'
+#TODO: TDD
+RSpec.describe "Convert number to kanji and opposite: " do
+  let(:s_num) { { '零' => 0, '一' => 1, '二' => 2, '三' => 3, '四' => 4,'五' => 5, '六' => 6, '七' => 7, '八' => 8, '九' => 9 } }
+  let(:m_num) { { '十' => 10, '百' => 100, '千' => 1000 } }
+  let(:l_num) { { '万' => 10**4, '億' => 10**8, '兆' => 10**12, '京' => 10**16, '垓' => 10**20, '𥝱' => 10**24,
+                  '穣' => 10**28, '溝' => 10**32, '澗' => 10**36, '正' => 10**40, '載' => 10**44, '極' => 10**48,
+                  '恒河沙' => 10**52, '阿僧祇' => 10**56, '那由他' => 10**60, '不可思議' => 10**64, '無量大数' => 10**68 } }
 
-RSpec.describe 'Kansuji test lib' do
-  # num -> kanji
-  context 'Kansuji test: kanji -> num' do
-    describe 'general case' do
-      it 'remove 零(zero) head before convert' do
-        expect('十一一零'.to_number).to eq 10 + 110
-        expect('零一'.to_number).to eq 1
-        expect('零十一'.to_number).to eq 11
-      end
-
-      it '10^0' do
-        expect('零'.to_number).to eq 0
-        expect('一'.to_number).to eq 1
-        expect('九'.to_number).to eq 9
-      end
-
-      it '10^1' do
-        expect('十'.to_number).to eq 10
-        expect('十一'.to_number).to eq 11
-        expect('十八'.to_number).to eq 18
-        expect('一十八'.to_number).to eq 18
-      end
-
-      it '10^2' do
-        expect('百'.to_number).to eq 100
-        expect('百一'.to_number).to eq 101
-        expect('百十一'.to_number).to eq 111
-      end
-
-      it '10^3' do
-        expect('千'.to_number).to eq 1000
-        expect('千一'.to_number).to eq 1001
-        expect('千七百'.to_number).to eq 1700
-      end
-
-      it '10^10' do
-        expect('')
-      end
-
-      it 'long int' do
-        expect('七百五十四億五千四百六十五万二千三百五十二'.to_number).to eq 75_454_652_352
-        expect('四千四百十三溝五千四百五十四穣八千九百四十四𥝱六千五百四十六垓七千六百七十九\
-        京四千四百六十五兆四千五百七十四億六千二百十五万六千三百二十四'.to_number).to eq\
-          441_354_548_944_654_676_794_465_457_462_156_324
-      end
-    end
-
-    describe 'Speacial cases' do
-      it 'empty string will convert to 0' do
-        expect(''.to_number).to eq 0
-      end
-
-      it 'Ignore strange(non kanji) characters' do
-        expect('!@!##%$#$%#$%$一十八'.to_number).to eq 18
-        expect('!@!##%$十八#$%#$%$'.to_number).to eq 18
-        expect('一!@!##%$十$$$$八#$%#$%$'.to_number).to eq 18
-        expect('!@!##%$_十$$se232535fsefs    efe$$八_#$%#$%$'.to_number).to eq 18
-      end
-
-      it 'Strange characters(no any kanji) will convert to 0' do
-        expect('Hello World 1234567 !@#$%%^&&*'.to_number).to eq 0
-      end
-
-      it 'Short rule' do
-        expect('一二三四五'.to_number).to eq 12_345
-        expect('五四三二一'.to_number).to eq 54_321
-      end
-
-      it 'Mix rule' do
-        expect('十一一'.to_number).to eq 21 # 10 + 11
-        expect('十一一零'.to_number).to eq 10 + 110
-        expect('兆十一一零零'.to_number).to eq 10**12 + 10 + 1100
-      end
-
-      it 'still right when bonus 一 before count char' do
-        expect('十一万千百十一'.to_number).to eq 111_111
-        expect('一十一万一千一百一十一'.to_number).to eq 111_111
-      end
-    end
+  it "Check to_kansuji function" do
+    expect{ 1212.212.to_kansuji }.to raise_error(NoMethodError)
+    expect{ 十二.to_kansuji }.to raise_error(NameError)
+    expect{ "1234".to_kansuji }.to raise_error(NoMethodError)
+    expect{ ["1234"].to_kansuji }.to raise_error(NoMethodError)
+    expect(11.to_kansuji).to eq "十一"
+    expect(469.to_kansuji).to eq "四百六十九"
+    expect(2025.to_kansuji).to eq "二千二十五"
+    expect(510000087621686252440100002073.to_kansuji).to eq "五十一穣八百七十六垓二千百六十八京六千二百五十二兆四千四百一億二千七十三"
+    expect(123456789012345678901234567890.to_kansuji).to eq "十二穣三千四百五十六𥝱七千八百九十垓千二百三十四京五千六百七十八兆九千十二億三千四百五十六万七千八百九十"
+    s_num.each { |key, value| expect(value.to_kansuji).to eq key }
+    m_num.each { |key, value| expect(value.to_kansuji).to eq key }
+    l_num.each { |key, value| expect(value.to_kansuji).to eq "一#{key}" }
   end
 
-  # kanji -> num
-  context 'Kansuji test: num -> kanji' do
-    it 'general cases' do
-      expect(0.to_kansuji).to eq '零'
-      expect(1.to_kansuji).to eq '一'
-      expect(11.to_kansuji).to eq '十一'
-      expect(110_000.to_kansuji).to eq '十一万'
-      expect((10**20 + 4 * 10**16).to_kansuji).to eq '垓四京'
-      expect(441_354_548_944_654_676_794_465_457_462_156_324.to_kansuji).\
-      to eq '四千四百十三溝五千四百五十四穣八千九百四十四𥝱六千五百四十六垓七千六百七十九京四千四百六十五兆四千五百七十四億六千二百十五万六千三百二十四'
+  it "Check to_number function" do
+    expect{ 1212.to_number }.to raise_error(NoMethodError)
+    expect{ 十二.to_number }.to raise_error(NameError)
+    expect{ ["十二"].to_number }.to raise_error(NoMethodError)
+    expect("".to_number).to eq 0
+    expect("1212".to_number).to eq 0
+    expect("45十21二67".to_number).to eq 12
+    expect("四    百六    十九".to_number).to eq 469
+    expect("十二".to_number).to eq 12
+    expect("四百六十九".to_number).to eq 469
+    expect("五十一穣八百七十六垓二千百六十八京六千二百五十二兆四千四百一億二千七十三".to_number).to eq 510000087621686252440100002073
+    expect("十二穣三千四百五十六𥝱七千八百九十垓千二百三十四京五千六百七十八兆九千十二億三千四百五十六万七千八百九十".to_number).to eq 123456789012345678901234567890
+    s_num.each { |key, value| expect(key.to_number).to eq value }
+    m_num.each { |key, value| expect(key.to_number).to eq value }
+    l_num.each { |key, value| expect("一#{key}".to_number).to eq value  }
+  end
+
+  it "Check to_number and to_kansuji functions together" do
+    10000.times do
+      number_random = Random.rand(10000000000000000000000000000000000000000000000000000000000000000000000)
+      expect(number_random.to_kansuji.to_number).to eq number_random
     end
   end
 end
