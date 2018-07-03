@@ -35,11 +35,12 @@ class String
   def kanji_to_num(str)
     return Kanji.num.find_index(str) if Kanji.num.include?(str)
     max_num = nil
-    Kanji.bcount.each { |_k, v| max_num = [str.index(v), v] if str.index(v) }
-    nums = str.chars.inject('') do |num, chr|
-      num + (Kanji.num.include?(chr) ? kanji_to_num(chr).to_s : '')
-    end .to_i
-    return nums if max_num.nil?
+    Kanji.bcount.each_value { |v| max_num = [str.index(v), v] if str.index(v) }
+    if max_num.nil?
+      return str.chars.inject('') do |num, chr|
+               num + (Kanji.num.include?(chr) ? kanji_to_num(chr).to_s : '')
+             end .to_i
+    end
     ((head = kanji_to_num(str[0, max_num[0]])).zero? ? 1 : head) * \
       10**(Kanji.bcount.key(max_num[1]) - 1) + kanji_to_num(str[(max_num[0] + \
         max_num[1].length)..-1])
