@@ -34,15 +34,14 @@ class String
 
   def kanji_to_num(str)
     return Kanji.num.find_index(str) if Kanji.num.include?(str)
-    max_num = nil
-    Kanji.bcount.each_value { |v| max_num = [str.index(v), v] if str.index(v) }
-    if max_num.nil?
+    if (max = Kanji.bcount.values.reverse.find(nil) { |v| str.index(v) }).nil?
       return str.chars.inject('') do |num, chr|
                num + (Kanji.num.include?(chr) ? kanji_to_num(chr).to_s : '')
              end .to_i
     end
-    ((head = kanji_to_num(str[0, max_num[0]])).zero? ? 1 : head) * \
-      10**(Kanji.bcount.key(max_num[1]) - 1) + kanji_to_num(str[(max_num[0] + \
-        max_num[1].length)..-1])
+    max = [str.index(max), max]
+    ((head = kanji_to_num(str[0, max[0]])).zero? ? 1 : head) * \
+      10**(Kanji.bcount.key(max[1]) - 1) + kanji_to_num(str[(max[0] + \
+        max[1].length)..-1])
   end
 end
