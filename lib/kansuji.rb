@@ -22,7 +22,7 @@ class Numeric
     count -= 1 until Kanji.bcount[count]
     first_char = num_to_kanji(str[0, str.length - count + 1])
     (first_char == '一' ? '' : first_char) + Kanji.bcount[count]\
-      + num_to_kanji(str[str.length - count + 1, count - 1])
+      + num_to_kanji(str[(str.length - count + 1)..-1])
   end
 end
 # Append method to class String
@@ -45,6 +45,6 @@ class String
     index_max = str.index(max_count)
     head = (first = str[0, index_max]).empty? ? 1 : kanji_to_num(first)
     (head.zero? ? 1 : head) * 10**(Kanji.bcount.key(max_count) - 1)\
-    + kanji_to_num(str[index_max + 1, str.length - index_max - 1])
+    + kanji_to_num(str[(index_max + 1)..-1])
   end
 end
