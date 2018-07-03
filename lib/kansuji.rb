@@ -18,8 +18,7 @@ class Numeric
 
   def num_to_kanji(str)
     return '' if (str = str.to_i.to_s) == '0'
-    return Kanji.num[str[0].to_i] if str.length == 1
-    count = str.length
+    return Kanji.num[str[0].to_i] if (count = str.length) == 1
     count -= 1 until Kanji.bcount[count]
     first_char = num_to_kanji(str[0, str.length - count + 1])
     (first_char == '一' && count < 5 ? '' : first_char) + Kanji.bcount[count]\
@@ -37,11 +36,10 @@ class String
     return Kanji.num.find_index(str) if Kanji.num.include?(str)
     max_num = nil
     Kanji.bcount.each { |_k, v| max_num = [str.index(v), v] if str.index(v) }
-    if max_num.nil?
-      return str.chars.inject('') do |num, chr|
-        num + (Kanji.num.include?(chr) ? kanji_to_num(chr).to_s : '')
-      end .to_i
-    end
+    nums =  str.chars.inject('') do |num, chr|
+      num + (Kanji.num.include?(chr) ? kanji_to_num(chr).to_s : '')
+    end .to_i
+    return nums if max_num.nil?
     ((head = kanji_to_num(str[0, max_num[0]])).zero? ? 1 : head) * \
       10**(Kanji.bcount.key(max_num[1]) - 1) + kanji_to_num(str[(max_num[0] + \
         max_num[1].length)..-1])
