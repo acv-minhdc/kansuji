@@ -36,7 +36,7 @@ class String
     return Kanji.num.find_index(str) if Kanji.num.include?(str)
     max_num = nil
     Kanji.bcount.each { |_k, v| max_num = [str.index(v), v] if str.index(v) }
-    nums =  str.chars.inject('') do |num, chr|
+    nums = str.chars.inject('') do |num, chr|
       num + (Kanji.num.include?(chr) ? kanji_to_num(chr).to_s : '')
     end .to_i
     return nums if max_num.nil?
