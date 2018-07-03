@@ -34,7 +34,6 @@ class String
   end
 
   def kanji_to_num(str)
-    return 0 if str.nil? || str.empty?
     return Kanji.num.find_index(str) if Kanji.num.include?(str)
     max_num = nil
     Kanji.bcount.each { |_k, v| max_num = [str.index(v), v] if str.index(v) }
@@ -43,8 +42,8 @@ class String
         num + (Kanji.num.include?(chr) ? kanji_to_num(chr).to_s : '')
       end .to_i
     end
-    head = (first = str[0, max_num[0]]).empty? ? 1 : kanji_to_num(first)
-    (head.zero? ? 1 : head) * 10**(Kanji.bcount.key(max_num[1]) - 1)\
-    + kanji_to_num(str[(max_num[0] + max_num[1].length)..-1])
+    ((head = kanji_to_num(str[0, max_num[0]])).zero? ? 1 : head) * \
+      10**(Kanji.bcount.key(max_num[1]) - 1) + kanji_to_num(str[(max_num[0] + \
+        max_num[1].length)..-1])
   end
 end
