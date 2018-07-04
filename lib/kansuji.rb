@@ -11,7 +11,7 @@ end
 # Append method to Numeric class
 class Integer
   include Kanji
-  def to_kansuji(str = to_s)
+  def to_kansuji(str = self)
     return Kanji.no[str.to_i] if (count = (str = str.to_i.to_s).length) == 1
     count -= 1 until Kanji.bcount[count]
     first_char = to_kansuji(str[0, str.length - count + 1])
