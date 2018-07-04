@@ -9,16 +9,15 @@ module Kanji
               57 => '阿僧祇', 61 => '那由他', 65 => '不可思議', 69 => '無量大数' }
 end
 # Append method to Numeric class
-class Numeric
+class Integer
   include Kanji
   def to_kansuji
-    raise_error(NoMethodError) if to_s.include?('.')
     zero? ? '零' : to_kanji(to_s)
   end
 
   def to_kanji(str)
     return '' if (str = str.to_i.to_s) == '0'
-    return Kanji.no[str[0].to_i] if (count = str.length) == 1
+    return Kanji.no[str.to_i] if (count = str.length) == 1
     count -= 1 until Kanji.bcount[count]
     first_char = to_kanji(str[0, str.length - count + 1])
     (first_char == '一' && count < 5 ? '' : first_char) + Kanji.bcount[count]\
