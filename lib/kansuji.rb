@@ -6,7 +6,7 @@ module Kanji
               37 => '澗', 41 => '正', 45 => '載', 49 => '極', 53 => '恒河沙',
               57 => '阿僧祇', 61 => '那由他', 65 => '不可思議', 69 => '無量大数' }
 end
-# Append method to Numeric class
+# Append method to Integer class
 class Integer
   def to_kansuji(str = self)
     return Kanji.no[str.to_i] if (count = (str = str.to_i.to_s).length) == 1
