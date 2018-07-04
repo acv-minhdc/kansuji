@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module Kanji
   class << self; attr_reader :no, :bcount end
   @no = %w[零 一 二 三 四 五 六 七 八 九]
@@ -10,7 +8,6 @@ module Kanji
 end
 # Append method to Numeric class
 class Integer
-  include Kanji
   def to_kansuji(str = self)
     return Kanji.no[str.to_i] if (count = (str = str.to_i.to_s).length) == 1
     count -= 1 until Kanji.bcount[count]
@@ -21,7 +18,6 @@ class Integer
 end
 # Append method to class String
 class String
-  include Kanji
   def to_number(str = self)
     return Kanji.no.find_index(str) if Kanji.no.include?(str)
     return str.chars.inject('') { |n, c| n + Kanji.no.find_index(c).to_s }.to_i\
