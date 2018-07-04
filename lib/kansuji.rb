@@ -11,32 +11,23 @@ end
 # Append method to Numeric class
 class Integer
   include Kanji
-  def to_kansuji
-    zero? ? '零' : to_kanji(to_s)
-  end
-
-  def to_kanji(str)
-    return '' if (str = str.to_i.to_s) == '0'
-    return Kanji.no[str.to_i] if (count = str.length) == 1
+  def to_kansuji(str = to_s)
+    return Kanji.no[str.to_i] if (count = (str = str.to_i.to_s).length) == 1
     count -= 1 until Kanji.bcount[count]
-    first_char = to_kanji(str[0, str.length - count + 1])
+    first_char = to_kansuji(str[0, str.length - count + 1])
     (first_char == '一' && count < 5 ? '' : first_char) + Kanji.bcount[count]\
-      + to_kanji(str[(str.length - count + 1)..-1])
+    + ((t = to_kansuji(str[(str.length - count + 1)..-1])) == '零' ? '' : t)
   end
 end
 # Append method to class String
 class String
   include Kanji
-  def to_number
-    to_num(self)
-  end
-
-  def to_num(str)
+  def to_number(str = self)
     return Kanji.no.find_index(str) if Kanji.no.include?(str)
     return str.chars.inject('') { |n, c| n + Kanji.no.find_index(c).to_s }.to_i\
       unless (max = Kanji.bcount.values.reverse.find { |v| str.index(v) })
     max = [str.index(max), max]
-    ((head = to_num(str[0, max[0]])).zero? ? 1 : head) * 10**(Kanji.bcount\
-      .key(max[1]) - 1) + to_num(str[(max[0] + max[1].length)..-1])
+    ((head = to_number(str[0, max[0]])).zero? ? 1 : head) * 10**(Kanji.bcount\
+      .key(max[1]) - 1) + to_number(str[(max[0] + max[1].length)..-1])
   end
 end
